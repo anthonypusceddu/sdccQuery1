@@ -43,18 +43,12 @@ public class Topology1 {
         Properties properties=new Properties();
         InputStream is=this.getClass().getResourceAsStream("/config.properties");
         properties.load(is);
-
-
-
         KafkaSpoutConfig<String, String> spoutConfig=getKafkaSpoutConfig(properties.getProperty("kafka.brokerurl"),properties.getProperty("kafka.topic"));
         Config conf=this.getConfig();
-
-
-
         if (args != null && args.length > 0) {
             System.out.println("argument1=" + args[0]);
             conf.setNumWorkers(3);
-            StormSubmitter.submitTopologyWithProgressBar("word-count", conf, this.getTopologyKafkaSpout(getKafkaSpoutConfig(properties.getProperty("kafka.brokerurl"),properties.getProperty("kafka.topic"))));
+            StormSubmitter.submitTopologyWithProgressBar("query1", conf, this.getTopologyKafkaSpout(getKafkaSpoutConfig(properties.getProperty("kafka.brokerurl"),properties.getProperty("kafka.topic"))));
         } else {
             System.out.println("Create local cluster");
             conf.setMaxTaskParallelism(3);
@@ -94,7 +88,7 @@ public class Topology1 {
 
         tp.setBolt(Costant.FILTER_QUERY_1,new FilterBolt(),Costant.NUM_FILTER_QUERY1).shuffleGrouping(Costant.KAFKA_SPOUT);
 
-        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(30)),Costant.NUM_AVG15M)
+        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(10)),Costant.NUM_AVG15M)
                 .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
 
        /* tp.setBolt(Costant.AVG1H_BOLT, new AvgBolt().withTumblingWindow(Duration.minutes(5)),Costant.NUM_AVG1H)
@@ -121,9 +115,6 @@ public class Topology1 {
         tp.setBolt(Costant.GLOBAL24H_AVG, new GlobalRankBolt(Costant.ID24H,Costant.NUM_AVG24H),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_24H);*/
         tp.setBolt("mongoDB",updateBolt,1).shuffleGrouping(Costant.GLOBAL15M_AVG);
-
-
-
         return tp.createTopology();
     }
     public static KafkaSpoutConfig<String, String> getKafkaSpoutConfig(String bootstrapServers,String topicName) {
@@ -143,6 +134,4 @@ public class Topology1 {
         return new KafkaSpoutRetryExponentialBackoff(KafkaSpoutRetryExponentialBackoff.TimeInterval.microSeconds(500),
                 KafkaSpoutRetryExponentialBackoff.TimeInterval.milliSeconds(2), Integer.MAX_VALUE, KafkaSpoutRetryExponentialBackoff.TimeInterval.seconds(10));
     }
-
-
 }
