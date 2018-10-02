@@ -7,6 +7,9 @@ public class Costant {
     public static final String INTERMEDIATERANK_24H = "intermediate24H" ;
 
 
+    public static final String F_RECORD = "record";
+    public static final String F_START_PROCESSING_TIME = "time";
+
     public static final String GLOBAL15M_AVG = "globalAvg15M";
     public static final String GLOBAL1H_AVG = "globalAvg1H";
     public static final String GLOBAL24H_AVG = "globalAvg24H";

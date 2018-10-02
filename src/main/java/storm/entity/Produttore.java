@@ -1,7 +1,5 @@
 package storm.entity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 /*
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -17,7 +15,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Produttore {
-    private Properties props;
+   /* private Properties props;
     private Producer<String, JsonNode> producer ;
     private ObjectMapper objectMapper;
 
@@ -63,5 +61,5 @@ public class Produttore {
         Produttore p = new Produttore();
         p.inviaRecord();
         p.terminaProduttore();
-    }
+    }*/
 }
