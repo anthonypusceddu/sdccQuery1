@@ -5,6 +5,11 @@ import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
 import org.apache.storm.shade.org.json.simple.JSONObject;
 import org.apache.storm.tuple.ITuple;
 import org.bson.Document;
+import storm.costant.Costant;
+import storm.entity.Intersection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CustomMongoUpdateMapper implements MongoMapper {
@@ -13,9 +18,19 @@ public class CustomMongoUpdateMapper implements MongoMapper {
     @Override
     public Document toDocument(ITuple tuple) {
         Document document = new Document();
-        for(String field : fields){
-            document.append(field, tuple.getValueByField(field));
+        String id = (String) tuple.getValueByField(Costant.ID);
+        document.append( "id" , id  );
+        List<Intersection> listToSave= (List<Intersection>) tuple.getValueByField(Costant.RANK_TOPK);
+        for ( int j = 0 ; j < listToSave.size() ; j++){
+            Intersection intersection = listToSave.get(j);
+            Document documentToAnnidate = new Document();
+            documentToAnnidate.append( "classifica", j+1 );
+            documentToAnnidate.append( "id", intersection.getId());
+            documentToAnnidate.append( "velocitaMedia", intersection.getVelocitaMedia() );
+            document.append( "valore"+ (j+1) , documentToAnnidate);
         }
+
+
         return new Document("$set", document);
     }
 

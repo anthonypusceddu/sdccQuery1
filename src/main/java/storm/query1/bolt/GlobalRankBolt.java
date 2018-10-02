@@ -1,11 +1,7 @@
 package storm.query1.bolt;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.mongodb.DBObject;
-import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
 import storm.costant.Costant;
 import storm.entity.Intersection;
 import org.apache.storm.shade.org.apache.commons.collections.ListUtils;
@@ -16,7 +12,6 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import storm.entity.Sensor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,17 +54,7 @@ public class GlobalRankBolt extends BaseRichBolt {
             sortOrderedRank(list);
         }
         if(countIntermediateRank >= repNum) {
-            ObjectMapper obj = new ObjectMapper();
-            ArrayList<Sensor> prova = new ArrayList<>();
-            prova.add(new Sensor(3,3,9,0));
-            prova.add(new Sensor(3,3,9,0));
-            prova.add(new Sensor(3,3,9,0));
-            prova.add(new Sensor(3,3,9,0));
-
-            //JsonNode jsonNode = obj.valueToTree(prova);
-            //String str=jsonNode.toString();
-            //System.err.println(jsonNode);
-            collector.emit(new Values(this.AvgType,new Sensor(3,3,9,0)));
+            collector.emit(new Values(this.AvgType,globalRanking));
             System.out.println(this.AvgType + "    " + globalRanking);
             globalRanking = null;
             globalRanking = new ArrayList<>();
