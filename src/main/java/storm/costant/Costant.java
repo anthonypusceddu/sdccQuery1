@@ -27,10 +27,13 @@ public class Costant {
     public static final int NUM_WEBSTER_BOLT = 3;
     public static final String MAP_INTERSECTION = "mapIntersection";
     public static final String PHASE = "phase";
-
-    // public static final String TOPIC_0 = "classifica";
-    // public static final String TOPIC_1 = "mediana";
-    //  public static final String KAFKA_LOCAL_BROKER = "localhost:9092";
+    public static final String MONGODB15M = "mongodb15M";
+    public static final String MONGODB1H = "mongodb1h";
+    public static final String MONGODB24H = "mongodb24h";
+    public static final int NUM_MONGOBOLT15M = 1;
+    public static final int NUM_MONGOBOLT1H = 1;
+    public static final int NUM_MONGOBOLT24H = 1;
+    public static final String QUERY1 = "query1";
 
     public static int N_INTERSECTIONS = 50;
     public static int YELLOW_TIME = 4;

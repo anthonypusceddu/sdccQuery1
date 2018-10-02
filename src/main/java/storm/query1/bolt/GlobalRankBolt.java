@@ -1,7 +1,5 @@
 package storm.query1.bolt;
 
-
-
 import storm.costant.Costant;
 import storm.entity.Intersection;
 import org.apache.storm.shade.org.apache.commons.collections.ListUtils;

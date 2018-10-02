@@ -1,8 +1,6 @@
 package storm.query1;
 
 import org.apache.storm.mongodb.common.mapper.MongoMapper;
-import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
-import org.apache.storm.shade.org.json.simple.JSONObject;
 import org.apache.storm.tuple.ITuple;
 import org.bson.Document;
 import storm.costant.Costant;
@@ -27,10 +25,8 @@ public class CustomMongoUpdateMapper implements MongoMapper {
             documentToAnnidate.append( "classifica", j+1 );
             documentToAnnidate.append( "id", intersection.getId());
             documentToAnnidate.append( "velocitaMedia", intersection.getVelocitaMedia() );
-            document.append( "valore"+ (j+1) , documentToAnnidate);
+            document.append( "valore "+ (j+1) , documentToAnnidate);
         }
-
-
         return new Document("$set", document);
     }
 

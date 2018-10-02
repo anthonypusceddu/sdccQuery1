@@ -37,10 +37,7 @@ public class FilterBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         List<Sensor> list;
-        //controllare integrità tupla e/o semaforo rotto
-        //System.err.println(input.getValueByField(Costant.F_RECORD));
         Sensor s=(Sensor) input.getValueByField(Costant.F_RECORD);
-        //System.err.println(s.toString());
         if ( mappa.containsKey(s.getIntersection()) ){//incrocio esiste in hasmap
             Intersection c;
             c = mappa.get(s.getIntersection());//prendi incrocio dall'hashmap
