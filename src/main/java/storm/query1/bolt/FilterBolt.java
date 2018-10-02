@@ -24,7 +24,7 @@ public class FilterBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields(Costant.ID,Costant.INTERSECTION,Costant.F_START_PROCESSING_TIME));
+        declarer.declare(new Fields(Costant.ID,Costant.INTERSECTION));
     }
 
 
@@ -49,8 +49,7 @@ public class FilterBolt extends BaseRichBolt {
                 mappa.remove(s.getIntersection());//rimuovi l'incrocio dall'hashmap
                 media(c);//calcola la media
                 inc=c;
-                //System.err.println(s.toString());
-                collector.emit(new Values( s.getIntersection(), inc ,3) );//emetti l'incrocio
+                collector.emit(new Values( s.getIntersection(), inc) );//emetti l'incrocio
             }
             else{//?
                 mappa.put(s.getIntersection(), inc);

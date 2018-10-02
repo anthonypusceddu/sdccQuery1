@@ -1,6 +1,8 @@
 package storm.query1;
 
 import org.apache.storm.mongodb.common.mapper.MongoMapper;
+import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
+import org.apache.storm.shade.org.json.simple.JSONObject;
 import org.apache.storm.tuple.ITuple;
 import org.bson.Document;
 

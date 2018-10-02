@@ -14,7 +14,7 @@ public class Intersection implements Comparator<Intersection> {
     private double VelocitaMedia;
     private double medianaVeicoli;
     private int numeroVeicoli;
-    private TDigest td1;
+    //private TDigest td1;
     private List<Phase> phases;
 
     public Intersection(){
@@ -24,7 +24,7 @@ public class Intersection implements Comparator<Intersection> {
     public Intersection(List<Sensor> l, int id) {
         this.l = l;
         this.id = id;
-        this.td1= new AVLTreeDigest(Costant.COMPRESSION);
+        //this.td1= new AVLTreeDigest(Costant.COMPRESSION);
     }
 
     public List<Sensor> getL() {
@@ -68,13 +68,13 @@ public class Intersection implements Comparator<Intersection> {
         this.medianaVeicoli = medianaVeicoli;
     }
 
-    public TDigest getTd1() {
+    /*lic TDigest getTd1() {
         return td1;
     }
 
     public void setTd1(TDigest td1) {
         this.td1 = td1;
-    }
+    }*/
 
     @Override
     public String toString(){

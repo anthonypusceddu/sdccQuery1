@@ -44,17 +44,7 @@ public class Topology1 {
         InputStream is=this.getClass().getResourceAsStream("/config.properties");
         properties.load(is);
 
-        String url="mongodb+srv://cris:mongodbpsw@sdccmongodb-3ecss.mongodb.net/sdccdb?retryWrites=true";
-        String collectionName = "sdccollection";
-        MongoMapper mapperUpdate = new CustomMongoUpdateMapper()
-                .withFields("word", "count");
 
-        QueryFilterCreator updateQueryCreator = new SimpleQueryFilterCreator().withField("word");
-
-        MongoUpdateBolt updateBolt = new MongoUpdateBolt(url, collectionName, updateQueryCreator, mapperUpdate);
-
-        //if a new document should be inserted if there are no matches to the query filter
-        updateBolt.withUpsert(true);
 
         KafkaSpoutConfig<String, String> spoutConfig=getKafkaSpoutConfig(properties.getProperty("kafka.brokerurl"),properties.getProperty("kafka.topic"));
         Config conf=this.getConfig();
@@ -86,37 +76,51 @@ public class Topology1 {
     }
 
      protected StormTopology getTopologyKafkaSpout(KafkaSpoutConfig<String, String> spoutConfig) {
+
+         String url="mongodb+srv://cris:mongodbpsw@sdccmongodb-3ecss.mongodb.net/sdccdb?retryWrites=true";
+         String collectionName = "sdccollectionTest";
+         MongoMapper mapperUpdate = new CustomMongoUpdateMapper()
+                 .withFields(Costant.ID, Costant.RANK_TOPK);
+
+         QueryFilterCreator updateQueryCreator = new SimpleQueryFilterCreator().withField(Costant.ID);
+
+         MongoUpdateBolt updateBolt = new MongoUpdateBolt(url, collectionName, updateQueryCreator, mapperUpdate);
+
+         //if a new document should be inserted if there are no matches to the query filter
+         updateBolt.withUpsert(true);
+
         final TopologyBuilder tp = new TopologyBuilder();
         tp.setSpout(Costant.KAFKA_SPOUT, new KafkaSpout<>(spoutConfig), Costant.NUM_SPOUT_QUERY_1);
 
         tp.setBolt(Costant.FILTER_QUERY_1,new FilterBolt(),Costant.NUM_FILTER_QUERY1).shuffleGrouping(Costant.KAFKA_SPOUT);
 
-        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.minutes(1)),Costant.NUM_AVG15M)
+        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(30)),Costant.NUM_AVG15M)
                 .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
 
        /* tp.setBolt(Costant.AVG1H_BOLT, new AvgBolt().withTumblingWindow(Duration.minutes(5)),Costant.NUM_AVG1H)
                 .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
 
         tp.setBolt(Costant.AVG24H_BOLT, new AvgBolt().withTumblingWindow(Duration.minutes(10)),Costant.NUM_AVG24H)
-                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
+                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));*/
 
         tp.setBolt(Costant.INTERMEDIATERANK_15M, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK15M)
                 .shuffleGrouping(Costant.AVG15M_BOLT);
 
-        tp.setBolt(Costant.INTERMEDIATERANK_1H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK1H)
+        /*tp.setBolt(Costant.INTERMEDIATERANK_1H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK1H)
                 .shuffleGrouping(Costant.AVG1H_BOLT);
 
         tp.setBolt(Costant.INTERMEDIATERANK_24H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK24H)
-                .shuffleGrouping(Costant.AVG24H_BOLT);
+                .shuffleGrouping(Costant.AVG24H_BOLT);*/
 
         tp.setBolt(Costant.GLOBAL15M_AVG, new GlobalRankBolt(Costant.ID15M,Costant.NUM_AVG15M),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_15M);
 
-        tp.setBolt(Costant.GLOBAL1H_AVG, new GlobalRankBolt(Costant.ID1H,Costant.NUM_AVG1H),Costant.NUM_GLOBAL_BOLT)
+      /*tp.setBolt(Costant.GLOBAL1H_AVG, new GlobalRankBolt(Costant.ID1H,Costant.NUM_AVG1H),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_1H);
 
         tp.setBolt(Costant.GLOBAL24H_AVG, new GlobalRankBolt(Costant.ID24H,Costant.NUM_AVG24H),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_24H);*/
+        tp.setBolt("mongoDB",updateBolt,1).shuffleGrouping(Costant.GLOBAL15M_AVG);
 
 
 
