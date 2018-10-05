@@ -1,5 +1,8 @@
 package storm.query1;
 
+
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.storm.kafka.spout.RecordTranslator;
@@ -11,16 +14,16 @@ import storm.entity.Sensor;
 import java.io.IOException;
 import java.util.List;
 
-public class KafkaTranslator implements RecordTranslator<String, String> {
+public class KafkaTranslator implements RecordTranslator<String, JsonNode> {
 
 
     @Override
-    public List<Object> apply(ConsumerRecord<String, String> consumerRecord) {
+    public List<Object> apply(ConsumerRecord<String, JsonNode> consumerRecord) {
         // Records coming from Kafka
-        String record = consumerRecord.value();
+        JsonNode record = consumerRecord.value();
         Sensor sen=null;
         try {
-            sen=new ObjectMapper().readValue(record,Sensor.class);
+            sen=new ObjectMapper().treeToValue(record, Sensor.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

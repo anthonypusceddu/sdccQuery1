@@ -56,7 +56,7 @@ public class Sensor {
 
     @Override
     public String toString(){
-        return "velocità "+this.speed +" num="+this.numVehicles;
+        return "Incrocio : "+ this.intersection + "semaforo : " + this.trafficLight + "velocità : "+this.speed +" num :"+this.numVehicles;
     }
 
     public double getSaturation() {

@@ -6,12 +6,10 @@ import org.bson.Document;
 import storm.costant.Costant;
 import storm.entity.Intersection;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class CustomMongoUpdateMapper implements MongoMapper {
-    private String[] fields;
 
     @Override
     public Document toDocument(ITuple tuple) {
@@ -31,7 +29,6 @@ public class CustomMongoUpdateMapper implements MongoMapper {
     }
 
     public CustomMongoUpdateMapper withFields(String... fields) {
-        this.fields = fields;
         return this;
     }
 }

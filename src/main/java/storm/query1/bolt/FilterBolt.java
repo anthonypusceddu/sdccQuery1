@@ -1,5 +1,6 @@
 package storm.query1.bolt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import storm.costant.Costant;
 import storm.entity.Intersection;
 import storm.entity.Sensor;
@@ -11,6 +12,7 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
