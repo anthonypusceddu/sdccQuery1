@@ -7,6 +7,7 @@ import storm.costant.Costant;
 import storm.entity.Intersection;
 
 import java.util.List;
+import java.util.Random;
 
 
 public class CustomMongoUpdateMapper implements MongoMapper {

@@ -34,6 +34,7 @@ public class AvgBolt extends BaseWindowedBolt {
 
     @Override
     public void execute(TupleWindow inputWindow) {
+        System.err.println("AVG ha iniziato a lavorare dopo X minuti");
         HashMap<Integer, Intersection> mappa = new HashMap<>();
         List<Tuple> tupleList = inputWindow.get();//ottieni la lista di tuple in finestra
         for ( Tuple t : tupleList){
@@ -52,6 +53,7 @@ public class AvgBolt extends BaseWindowedBolt {
         }
         mappa.clear();
         collector.emit(new Values(classifica));//emetti la classifica
+        System.err.println("AVG ha emesso");
     }
 
     private Intersection processAvg(Intersection oldi, Intersection i){//aggiorna la media pesata tra 2 incroci

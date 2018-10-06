@@ -52,9 +52,9 @@ public class Costant {
     public static final int WINDOW_HOUR = 1;
     public static final int WINDOW_DAY = 1;
 
-    public static final int NUM_AVG15M = 3;
-    public static final int NUM_AVG1H = 3;
-    public static final int NUM_AVG24H = 3;
+    public static final int NUM_AVG15M = 1;
+    public static final int NUM_AVG1H = 1;
+    public static final int NUM_AVG24H = 1;
 
     // QUERY 2 Costants
     public static final int NUM_MEDIAN_15M_BOLT = 1;

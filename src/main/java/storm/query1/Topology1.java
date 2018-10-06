@@ -12,10 +12,7 @@ import org.apache.storm.mongodb.common.SimpleQueryFilterCreator;
 import org.apache.storm.mongodb.common.mapper.MongoMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import storm.costant.Costant;
-import storm.query1.bolt.AvgBolt;
-import storm.query1.bolt.FilterBolt;
-import storm.query1.bolt.GlobalRankBolt;
-import storm.query1.bolt.IntermediateRankBolt;
+import storm.query1.bolt.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.StormTopology;
@@ -28,10 +25,9 @@ import org.apache.storm.topology.base.BaseWindowedBolt.Duration;
 import org.apache.storm.tuple.Fields;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Properties;
 
-import static org.apache.storm.kafka.spout.KafkaSpoutConfig.FirstPollOffsetStrategy.EARLIEST;
-import static org.apache.storm.kafka.spout.KafkaSpoutConfig.FirstPollOffsetStrategy.LATEST;
 import static org.apache.storm.kafka.spout.KafkaSpoutConfig.FirstPollOffsetStrategy.UNCOMMITTED_LATEST;
 
 public class Topology1 {
@@ -69,7 +65,7 @@ public class Topology1 {
     protected Config getConfig(){
         Config config = new Config();
         config.setDebug(false);
-        config.setMessageTimeoutSecs(6000);
+        config.setMessageTimeoutSecs(40000);
         return config;
     }
 
@@ -94,60 +90,51 @@ public class Topology1 {
 
         final TopologyBuilder tp = new TopologyBuilder();
         tp.setSpout(Costant.KAFKA_SPOUT, new KafkaSpout(spoutConfig), Costant.NUM_SPOUT_QUERY_1);
-
         tp.setBolt(Costant.FILTER_QUERY_1,new FilterBolt(),Costant.NUM_FILTER_QUERY1).shuffleGrouping(Costant.KAFKA_SPOUT);
-        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(60)),Costant.NUM_AVG15M)
-                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
 
-        tp.setBolt(Costant.AVG1H_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(90)),Costant.NUM_AVG1H)
-                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
+        tp.setBolt(Costant.AVG15M_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(5)),Costant.NUM_AVG15M)
+                .fieldsGrouping(Costant.FILTER_QUERY_1,"Stream15M", new Fields(Costant.ID));
+/*
+        tp.setBolt(Costant.AVG1H_BOLT, new AvgBolt().withTumblingWindow(Duration.minutes(4)),Costant.NUM_AVG1H)
+                .fieldsGrouping(Costant.FILTER_QUERY_1, "Stream1H" ,new Fields(Costant.ID));
 
-        tp.setBolt(Costant.AVG24H_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(120)),Costant.NUM_AVG24H)
-                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));
+        tp.setBolt(Costant.AVG24H_BOLT, new AvgBolt().withTumblingWindow(Duration.seconds(40)),Costant.NUM_AVG24H)
+                .fieldsGrouping(Costant.FILTER_QUERY_1, new Fields(Costant.ID));*/
 
         tp.setBolt(Costant.INTERMEDIATERANK_15M, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK15M)
                 .shuffleGrouping(Costant.AVG15M_BOLT);
 
-        tp.setBolt(Costant.INTERMEDIATERANK_1H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK1H)
+      /*  tp.setBolt(Costant.INTERMEDIATERANK_1H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK1H)
                 .shuffleGrouping(Costant.AVG1H_BOLT);
 
         tp.setBolt(Costant.INTERMEDIATERANK_24H, new IntermediateRankBolt(), Costant.NUM_INTERMEDIATERANK24H)
-                .shuffleGrouping(Costant.AVG24H_BOLT);
+                .shuffleGrouping(Costant.AVG24H_BOLT);*/
 
         tp.setBolt(Costant.GLOBAL15M_AVG, new GlobalRankBolt(Costant.ID15M,Costant.NUM_AVG15M),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_15M);
 
-        tp.setBolt(Costant.GLOBAL1H_AVG, new GlobalRankBolt(Costant.ID1H,Costant.NUM_AVG1H),Costant.NUM_GLOBAL_BOLT)
+       /* tp.setBolt(Costant.GLOBAL1H_AVG, new GlobalRankBolt(Costant.ID1H,Costant.NUM_AVG1H),Costant.NUM_GLOBAL_BOLT)
                 .shuffleGrouping(Costant.INTERMEDIATERANK_1H);
 
         tp.setBolt(Costant.GLOBAL24H_AVG, new GlobalRankBolt(Costant.ID24H,Costant.NUM_AVG24H),Costant.NUM_GLOBAL_BOLT)
-                .shuffleGrouping(Costant.INTERMEDIATERANK_24H);
+                .shuffleGrouping(Costant.INTERMEDIATERANK_24H);*/
         tp.setBolt(Costant.MONGODB15M,updateBolt15M,Costant.NUM_MONGOBOLT15M).shuffleGrouping(Costant.GLOBAL15M_AVG);
-        tp.setBolt(Costant.MONGODB1H,updateBolt1H,Costant.NUM_MONGOBOLT1H).shuffleGrouping(Costant.GLOBAL1H_AVG);
-        tp.setBolt(Costant.MONGODB24H,updateBolt24H,Costant.NUM_MONGOBOLT24H).shuffleGrouping(Costant.GLOBAL24H_AVG);
+         /*tp.setBolt(Costant.MONGODB1H,updateBolt1H,Costant.NUM_MONGOBOLT1H).shuffleGrouping(Costant.GLOBAL1H_AVG);
+         tp.setBolt(Costant.MONGODB24H,updateBolt24H,Costant.NUM_MONGOBOLT24H).shuffleGrouping(Costant.GLOBAL24H_AVG);*/
         return tp.createTopology();
     }
     public static KafkaSpoutConfig<String, JsonNode> getKafkaSpoutConfig(String bootstrapServers,String topicName,Properties properties) {
 
         KafkaTranslator p = new KafkaTranslator();
-        Builder<String,JsonNode> kafkaSpoutConfig = new Builder(bootstrapServers, StringDeserializer.class, org.apache.kafka.connect.json.JsonDeserializer.class, topicName);
-        return kafkaSpoutConfig
+        Builder<String,JsonNode> kafkaSpoutConfigBuilder = new Builder(bootstrapServers, StringDeserializer.class, org.apache.kafka.connect.json.JsonDeserializer.class, topicName);
+        return kafkaSpoutConfigBuilder
                 .setProp(ConsumerConfig.GROUP_ID_CONFIG,properties.getProperty("nameConsumerGroup"))
-               // .setProp(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG," org.apache.kafka.common.serialization.StringDeserializer")
                 .setRetry(getRetryService())
                 .setOffsetCommitPeriodMs(10_000)
                 .setFirstPollOffsetStrategy(UNCOMMITTED_LATEST)
                 .setMaxUncommittedOffsets(250)
                 .setRecordTranslator(p)
                 .build();
-        /*return KafkaSpoutConfig.Builder(bootstrapServers,topicName)
-                .setProp(ConsumerConfig.GROUP_ID_CONFIG,properties.getProperty("nameConsumerGroup"))
-                .setProp(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG," org.apache.kafka.common.serialization.StringDeserializer")
-                .setRetry(getRetryService())
-                .setOffsetCommitPeriodMs(10_000)
-                .setFirstPollOffsetStrategy(UNCOMMITTED_LATEST)
-                .setMaxUncommittedOffsets(250)
-                .build();*/
     }
     public static KafkaSpoutRetryService getRetryService() {
         return new KafkaSpoutRetryExponentialBackoff(KafkaSpoutRetryExponentialBackoff.TimeInterval.microSeconds(500),

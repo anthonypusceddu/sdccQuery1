@@ -4,10 +4,11 @@ import storm.costant.Costant;
 import com.tdunning.math.stats.AVLTreeDigest;
 import com.tdunning.math.stats.TDigest;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
-public class Intersection implements Comparator<Intersection> {
+public class Intersection implements Comparator<Intersection>, Serializable {
 
     private List<Sensor> l;
     private int id;

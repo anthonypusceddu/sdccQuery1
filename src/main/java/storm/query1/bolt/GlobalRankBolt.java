@@ -1,5 +1,7 @@
 package storm.query1.bolt;
 
+import org.apache.storm.topology.BasicOutputCollector;
+import org.apache.storm.topology.base.BaseBasicBolt;
 import storm.costant.Costant;
 import storm.entity.Intersection;
 import org.apache.storm.shade.org.apache.commons.collections.ListUtils;
@@ -16,10 +18,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class GlobalRankBolt extends BaseRichBolt {
-    private OutputCollector collector;
-    private int countIntermediateRank;
-    private List<Intersection> globalRanking;
+public class GlobalRankBolt extends BaseBasicBolt {
+    private int countIntermediateRank = 0;
+    private List<Intersection> globalRanking = new ArrayList<>();
     private String AvgType;
     private int repNum;
 
@@ -27,6 +28,7 @@ public class GlobalRankBolt extends BaseRichBolt {
     public GlobalRankBolt(String avgBolt, int rep) {
         this.AvgType = avgBolt;
         this.repNum = rep;
+        //globalRanking = new ArrayList<>();
     }
 
     @Override
@@ -34,16 +36,11 @@ public class GlobalRankBolt extends BaseRichBolt {
         declarer.declare(new Fields(Costant.ID,Costant.RANK_TOPK));
     }
 
-    @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.collector = outputCollector;
-        globalRanking = new ArrayList<>();
-        countIntermediateRank = 0;
-    }
 
     @Override
-    public void execute(Tuple tuple) {
+    public void execute(Tuple tuple, BasicOutputCollector collector) {
 
+       // System.err.println("---------------------------------------" +globalRanking);
         List<Intersection> list = ( List<Intersection> ) tuple.getValueByField(Costant.PARTIAL_RANK);
         countIntermediateRank++;
         if(globalRanking.isEmpty()) {
@@ -56,6 +53,7 @@ public class GlobalRankBolt extends BaseRichBolt {
             System.out.println(this.AvgType + "    " + globalRanking);
             globalRanking = null;
             globalRanking = new ArrayList<>();
+           // System.err.println("globalRanking"+globalRanking);
             countIntermediateRank = 0;
         }
 
@@ -73,9 +71,16 @@ public class GlobalRankBolt extends BaseRichBolt {
     private List<Intersection> unionAndSort(List<Intersection> list1, List<Intersection> list2){
         List<Intersection> l = ListUtils.union(list1,list2);
         Collections.sort(l,new Intersection());
-        if(l.size()> Costant.TOP_K)
-            l = l.subList(0,Costant.TOP_K);
-        return l;
+        List<Intersection> l2 = null;
+        if(l.size()> Costant.TOP_K) {
+            l2 = new ArrayList<>(l.subList(0, Costant.TOP_K));
+            return l2;
+        }
+        else{
+            return l;
+        }
+
     }
+
 
 }
