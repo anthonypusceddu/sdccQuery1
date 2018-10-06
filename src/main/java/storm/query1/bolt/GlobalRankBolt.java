@@ -28,7 +28,6 @@ public class GlobalRankBolt extends BaseBasicBolt {
     public GlobalRankBolt(String avgBolt, int rep) {
         this.AvgType = avgBolt;
         this.repNum = rep;
-        //globalRanking = new ArrayList<>();
     }
 
     @Override
@@ -39,8 +38,6 @@ public class GlobalRankBolt extends BaseBasicBolt {
 
     @Override
     public void execute(Tuple tuple, BasicOutputCollector collector) {
-
-       // System.err.println("---------------------------------------" +globalRanking);
         List<Intersection> list = ( List<Intersection> ) tuple.getValueByField(Costant.PARTIAL_RANK);
         countIntermediateRank++;
         if(globalRanking.isEmpty()) {
@@ -53,7 +50,6 @@ public class GlobalRankBolt extends BaseBasicBolt {
             System.out.println(this.AvgType + "    " + globalRanking);
             globalRanking = null;
             globalRanking = new ArrayList<>();
-           // System.err.println("globalRanking"+globalRanking);
             countIntermediateRank = 0;
         }
 

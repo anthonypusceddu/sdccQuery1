@@ -22,23 +22,21 @@ import java.util.Map;
 
 public class FilterBolt extends BaseBasicBolt {
 //il filter bolt riceve semafori e invia incroci quando essi sono completi
-    //private OutputCollector collector;
     private HashMap<Integer, Intersection> mappa = new HashMap<>();
     private Intersection inc;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields(Costant.ID,Costant.INTERSECTION));
-        declarer.declareStream("Stream15M",new Fields(Costant.ID,Costant.INTERSECTION));
-        declarer.declareStream("Stream1H",new Fields(Costant.ID,Costant.INTERSECTION));
-        declarer.declareStream("Stream24H",new Fields(Costant.ID,Costant.INTERSECTION));
+        declarer.declareStream(Costant.STREAM_15M,new Fields(Costant.ID,Costant.INTERSECTION));
+        declarer.declareStream(Costant.STREAM_1H,new Fields(Costant.ID,Costant.INTERSECTION));
+        declarer.declareStream(Costant.STREAM_24H,new Fields(Costant.ID,Costant.INTERSECTION));
     }
 
 
     @Override
     public void execute(Tuple input, BasicOutputCollector collector) {
         List<Sensor> list;
-       // System.err.println(input.getValueByField(Costant.F_RECORD));
         Sensor s=(Sensor) input.getValueByField(Costant.F_RECORD);
         if ( mappa.containsKey(s.getIntersection()) ){//incrocio esiste in hasmap
             Intersection c;
@@ -48,8 +46,9 @@ public class FilterBolt extends BaseBasicBolt {
                 mappa.remove(s.getIntersection());//rimuovi l'incrocio dall'hashmap
                 media(c);//calcola la media
                 inc=c;
-                collector.emit("Stream15M",new Values( s.getIntersection(), inc) );//emetti l'incrocio
-                collector.emit("Stream1H",new Values( s.getIntersection(), inc) );//emetti l'incrocio
+                collector.emit(Costant.STREAM_15M,new Values( s.getIntersection(), inc) );//emetti l'incrocio
+                collector.emit(Costant.STREAM_1H,new Values( s.getIntersection(), inc) );//emetti l'incrocio
+                collector.emit(Costant.STREAM_24H,new Values( s.getIntersection(), inc) );//emetti l'incrocio
 
             }
             else{//?

@@ -4,10 +4,7 @@ import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.base.BaseBasicBolt;
 import storm.costant.Costant;
 import storm.entity.Intersection;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
@@ -15,7 +12,6 @@ import org.apache.storm.tuple.Values;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class IntermediateRankBolt extends BaseBasicBolt {
 
