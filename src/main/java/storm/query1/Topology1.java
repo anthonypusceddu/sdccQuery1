@@ -125,7 +125,6 @@ public class Topology1 {
                 .setProp(ConsumerConfig.GROUP_ID_CONFIG,properties.getProperty("nameConsumerGroup"))
                 //.setRetry(getRetryService())
                 //.setOffsetCommitPeriodMs(10_000)
-                //.setFirstPollOffsetStrategy(UNCOMMITTED_LATEST)
                 .setFirstPollOffsetStrategy(LATEST)
                 //.setMaxUncommittedOffsets(250)
                 .setRecordTranslator(kafkaTranslator)
