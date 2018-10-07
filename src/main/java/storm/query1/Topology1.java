@@ -54,7 +54,7 @@ public class Topology1 {
             cluster.submitTopology(properties.getProperty("topologyName"), conf,this.getTopologyKafkaSpout(getKafkaSpoutConfig(properties.getProperty("kafka.brokerurl"),properties.getProperty("kafka.topic"),this.properties)));
             //shutdown the cluster
             /*Thread.sleep(15000);
-             cluster.killTopology("word-count");
+             cluster.killTopology(properties.getProperty("topologyName"));
              cluster.shutdown();
              System.exit(0);*/
         }
